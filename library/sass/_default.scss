@@ -1,8 +1,10 @@
-@import "base";
+html {
+	font-size: 62.5%;
+}
 
 body {
 	font-size: 14px;
-	font-family: Georgia, serif;
+	font-family: $font;
 	color: #333333;
 	background-color: #fefefe;
 }

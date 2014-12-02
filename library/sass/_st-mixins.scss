@@ -1,0 +1,301 @@
+//Useful functions and Mixins
+@function pxtoem($px, $base: $base-font-size){
+  @return ($px / $base) + 0em;
+}
+
+@mixin center{
+  @include transform(translateX(-50%) translateY(-50%));
+  position: absolute;
+  top: 50%;
+  left: 50%;  
+}
+
+@mixin maintain-aspect-ratio($width, $height){
+  position: relative;
+  &:before{
+    display: block;
+    content: " ";
+    width: 100%;
+    padding-top: ($height / $width) * 100%;
+  }
+
+  > .content{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+}
+
+@mixin background-size($size: cover){
+  background-size: $size;
+  -ms-behavior: url('/library/js/polyfill/backgroundsize.min.htc');
+  @if $size == contain {
+    background-repeat: no-repeat;
+  }
+  @else if $size == cover {
+    background-repeat: no-repeat;
+    background-position: center center;
+    // background-attachment: fixed;
+  }
+}
+
+@mixin background-opacity($color, $opacity: 0.3) {
+  background-color: $color;
+  background-color: rgba($color, $opacity);
+}
+
+@mixin clearfix{
+  *zoom: 1;
+
+  &:before, &:after{
+    content: " ";
+    display: table;
+  }
+
+  &:after{
+    clear: both;
+  };
+}
+
+@mixin triangle($side, $width, $height, $color) {
+    width: 0;
+    height: 0;
+    border-style: inset;   
+ 
+    @if ($side == 'top') {
+        border-width: 0 ($width/2)+0px $height+0px ($width/2)+0px;
+        border-color: rgba(255, 255, 255, 0) rgba(255, 255, 255, 0) $color rgba(255, 255, 255, 0);
+        border-bottom-style: solid;
+    }
+    @else if ($side == 'right') {
+        border-width: ($height/2)+0px 0 ($height/2)+0px $width+0px;
+        border-color: rgba(255, 255, 255, 0) rgba(255, 255, 255, 0) rgba(255, 255, 255, 0) $color;
+        border-left-style: solid;
+    }
+    @else if ($side == 'bottom') {
+        border-width: $height+0px ($width/2)+0px 0 ($width/2)+0px;
+        border-color:$color rgba(255, 255, 255, 0) rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
+        border-top-style: solid;
+    }
+    @else if ($side == 'left') {
+        border-width: ($height/2)+0px $width+0px ($height/2)+0px 0;
+        border-color: rgba(255, 255, 255, 0) $color rgba(255, 255, 255, 0) rgba(255, 255, 255, 0);
+        border-right-style: solid;
+    }
+}
+
+@mixin select-wrapper {
+    position: relative;
+    z-index: 2;
+    display: block;
+    // border: 3px solid $light-grey;
+    // background-color: $white;
+    overflow: hidden;
+
+    SELECT {
+        position: relative;
+        z-index: 1;
+        width: 110%;
+        border: none;
+        // padding: 0.2em;
+        background: transparent;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        -o-appearance: none;
+        appearance: none;
+    }
+    &:after {
+        @extend .icon;
+        @extend .icon-chevron-down:before;
+        position: absolute;
+        top: 0;
+        right: 0;
+        font-size: 1.4em;
+        width: 1.4em;
+        line-height: 1.4em;
+        text-align: center;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    &:hover {
+        &:after {
+            @include transition(color .5s ease);
+            // color: $dark-teal;
+        }
+    }
+}
+
+@mixin font-size($sizeValue: 1.6) {
+  font-size: ($sizeValue * 10) + px;
+  font-size: $sizeValue + rem;
+}
+
+@function strip-unit($num) {
+  @return $num / ($num * 0 + 1);
+}
+
+@mixin rem($property, $values...) {
+  $base: 10;
+  $max: length($values);
+  $pxValues: '';
+  $remValues: '';
+
+  @for $i from 1 through $max {
+    $value: strip-unit(nth($values, $i));
+    $pxValues: #{$pxValues + $value * $base}px;
+
+    @if $i < $max {
+      $pxValues: #{$pxValues + " "};
+    }
+  } 
+
+  @for $i from 1 through $max {
+    $value: strip-unit(nth($values, $i));
+    $remValues: #{$remValues + $value}rem;
+
+    @if $i < $max {
+      $remValues: #{$remValues + " "};
+    }
+  } 
+  
+  #{$property}: $pxValues; 
+  #{$property}: $remValues; 
+}
+
+@mixin hide-scrollbar() {
+  .touch & {
+    &::-webkit-scrollbar {
+      width: 0 !important;
+    }  
+    -ms-overflow-style: none;
+    overflow: -moz-scrollbars-none;
+  }
+}
+
+@mixin margin-padding-rules($media: "") {
+  $sides: top right bottom left;
+  $values: 0 1 2 3 4 5 6 7 8 9 10;
+  @if $media != "" {
+    $media: "-" + $media;
+  }
+  @each $val in $values {
+    @each $side in $sides {
+      .margin-#{$val}#{$media} { @include rem(margin, $val); }
+      .margin-#{$side}-#{$val}#{$media} { @include rem(margin-#{$side}, $val); }
+      .padding-#{$val}#{$media} { @include rem(padding, $val); }
+      .padding-#{$side}-#{$val}#{$media} { @include rem(padding-#{$side}, $val); }
+    }
+  }
+}
+
+@mixin layout-rules($mode: "", $orientation: "") {
+  @if $mode != "" {
+    $mode: "-" + $mode;
+  }
+  @if $orientation != "" {
+    $orientation: "-" + $orientation;
+  }
+
+  // hide-show rules
+  .display-block#{$mode}#{$orientation} {
+    display: block;
+  }
+  .display-inline-block#{$mode}#{$orientation} {
+    display: inline-block;
+  }
+  .display-inline#{$mode}#{$orientation} {
+    display: inline;
+  }
+  .hide#{$mode}#{$orientation} {
+    display: none;
+  }
+
+  // Border rules
+  .border-top#{$mode}#{$orientation} {
+    border-top: 1px solid map-get($colors, border);
+  }
+  .border-right#{$mode}#{$orientation} {
+    border-right: 1px solid map-get($colors, border);
+  }
+  .border-bottom#{$mode}#{$orientation} {
+    border-bottom: 1px solid map-get($colors, border);
+  }
+  .border-left#{$mode}#{$orientation} {
+    border-left: 1px solid map-get($colors, border);
+  }
+
+  // column rules
+  .full#{$mode}#{$orientation} {
+    display: inline-block;
+    vertical-align: top;
+    width: 100%;
+  }
+  .half#{$mode}#{$orientation} {
+    display: inline-block;
+    vertical-align: top;
+    width: 50%;
+  }
+  .one-third#{$mode}#{$orientation} {
+    display: inline-block;
+    vertical-align: top;
+    width: 33%;
+  }
+  .two-thirds#{$mode}#{$orientation} {
+    display: inline-block;
+    vertical-align: top;
+    width: 67%;
+  }
+  .one-fourth#{$mode}#{$orientation} {
+    display: inline-block;
+    vertical-align: top;
+    width: 25%;
+  }
+  .three-fourths#{$mode}#{$orientation} {
+    display: inline-block;
+    vertical-align: top;
+    width: 75%;
+  }
+}
+
+@mixin max-width($width: 1600px) {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: $width;
+}
+
+//JQuery timing functions:
+// EASE IN
+$ease-in-quad:      cubic-bezier(0.550,  0.085, 0.680, 0.530);
+$ease-in-cubic:     cubic-bezier(0.550,  0.055, 0.675, 0.190);
+$ease-in-quart:     cubic-bezier(0.895,  0.030, 0.685, 0.220);
+$ease-in-quint:     cubic-bezier(0.755,  0.050, 0.855, 0.060);
+$ease-in-sine:      cubic-bezier(0.470,  0.000, 0.745, 0.715);
+$ease-in-expo:      cubic-bezier(0.950,  0.050, 0.795, 0.035);
+$ease-in-circ:      cubic-bezier(0.600,  0.040, 0.980, 0.335);
+$ease-in-back:      cubic-bezier(0.600, -0.280, 0.735, 0.045);
+
+// EASE OUT
+$ease-out-quad:     cubic-bezier(0.250,  0.460, 0.450, 0.940);
+$ease-out-cubic:    cubic-bezier(0.215,  0.610, 0.355, 1.000);
+$ease-out-quart:    cubic-bezier(0.165,  0.840, 0.440, 1.000);
+$ease-out-quint:    cubic-bezier(0.230,  1.000, 0.320, 1.000);
+$ease-out-sine:     cubic-bezier(0.390,  0.575, 0.565, 1.000);
+$ease-out-expo:     cubic-bezier(0.190,  1.000, 0.220, 1.000);
+$ease-out-circ:     cubic-bezier(0.075,  0.820, 0.165, 1.000);
+$ease-out-back:     cubic-bezier(0.175,  0.885, 0.320, 1.275);
+
+// EASE IN OUT
+$ease-in-out-quad:  cubic-bezier(0.455,  0.030, 0.515, 0.955);
+$ease-in-out-cubic: cubic-bezier(0.645,  0.045, 0.355, 1.000);
+$ease-in-out-quart: cubic-bezier(0.770,  0.000, 0.175, 1.000);
+$ease-in-out-quint: cubic-bezier(0.860,  0.000, 0.070, 1.000);
+$ease-in-out-sine:  cubic-bezier(0.445,  0.050, 0.550, 0.950);
+$ease-in-out-expo:  cubic-bezier(1.000,  0.000, 0.000, 1.000);
+$ease-in-out-circ:  cubic-bezier(0.785,  0.135, 0.150, 0.860);
+$ease-in-out-back:  cubic-bezier(0.680, -0.550, 0.265, 1.550);
+
+

@@ -1,0 +1,63 @@
+$column-count: 12;
+
+//Breakpoints
+$iphone-portrait: 320px;
+$iphone-landscape: 480px;
+$six-forty: 640px;
+$ipad-portrait: 768px;
+$ipad-landscape: 1024px;
+$twelve-eighty: 1280px;
+$fourteen-hundred: 1400px;
+
+*, *:before, *:after {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-o-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+@for $i from 1 through $column-count {
+	%col-#{$i} {
+		display: inline-block;
+		vertical-align: top;
+		width: ($i / $column-count) * 100%;
+		@include rem(padding, 1, 2);
+	}
+}
+
+header, footer {
+	@include rem(padding, 1, 2);
+}
+
+article {
+	@extend %col-8;
+
+	.blurb {
+		@extend %col-4;
+
+		&:first-of-type {
+			padding-left: 0;
+		}
+		&:last-of-type {
+			padding-right: 0;
+		}
+	}
+}
+aside {
+	@extend %col-4;
+}
+
+footer {
+	@include font-size(1.2);
+}
+
+// @media screen and (max-width: $ipad-landscape) {
+// 	article, aside {
+// 		@extend %col-12;
+// 	}
+// 	article  {
+// 		.blurb {
+// 			@extend %col-12;
+// 		}
+// 	}
+// }

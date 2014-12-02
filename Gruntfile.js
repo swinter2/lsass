@@ -3,11 +3,11 @@ module.exports = function(grunt) {
 		pkg: grunt.file.readJSON('package.json'),
 		watch: {
 			sass: {
-				files: ['sass/**/*.{scss,sass}','sass/_partials/**/*.{scss,sass}'],
+				files: ['library/sass/**/*.{scss,sass}','library/sass/_partials/**/*.{scss,sass}'],
 				tasks: ['sass:dist']
 			},
 			livereload: {
-				files: ['*.html', '*.php', 'js/**/*.{js,json}', 'css/*.css','img/**/*.{png,jpg,jpeg,gif,webp,svg}'],
+				files: ['*.html', '*.php', 'library/js/**/*.{js,json}', 'public/library/css/*.css','library/img/**/*.{png,jpg,jpeg,gif,webp,svg}'],
 				options: {
 					livereload: true
 				}
@@ -16,16 +16,27 @@ module.exports = function(grunt) {
 		sass: {
 			options: {
 				sourceMap: true,
-				outputStyle: 'compressed'
+				outputStyle: 'expanded'
 			},
 			dist: {
 				files: {
-					'css/styles.css': 'sass/styles.scss'
+					'public/library/css/screen.css': 'library/sass/screen.scss'
 				}
 			}
-		}
+		},
+	    express: {
+	      options: {
+	        port: 1337,
+	      },
+	      dev: {
+	        options: {
+	          script: 'index.js'
+	        }
+	      }
+	    },
 	});
-	grunt.registerTask('default', ['sass:dist', 'watch']);
+	grunt.registerTask('default', ['sass:dist', 'express:dev', 'watch']);
 	grunt.loadNpmTasks('grunt-sass');
 	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-express-server');
 };
